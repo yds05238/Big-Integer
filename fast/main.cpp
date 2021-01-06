@@ -55,6 +55,8 @@ std::string async_encrypt(const int tp, const std::string& subline) {
 }
 
 const reverse::Bigint Bbig("100000");
+const unsigned int rsa_n_size = rsa_n.size();
+const int rsa_n_size3 = rsa_n.size() / 3;
 
 std::string async_decrypt(const int tp, const std::string& st) {
     const reverse::Bigint pst = reverse::Bigint(st).decrypt(rsa_n, rsa_d);
@@ -159,10 +161,10 @@ int main(int argc, char** argv) {
                 std::string next_line;
                 std::getline(std::cin, next_line);
 
-                if (next_line.size() * 3 > rsa_n.size()) {
+                if (next_line.size() * 3 > rsa_n_size) {
                     // 2 lines
-                    const std::string sub1 = next_line.substr(0, rsa_n.size() / 3);
-                    const std::string sub2 = next_line.substr(rsa_n.size() / 3, rsa_n.size() / 3);
+                    const std::string sub1 = next_line.substr(0, rsa_n_size3);
+                    const std::string sub2 = next_line.substr(rsa_n_size3, rsa_n_size3);
 
                     fut_encrypt.emplace_back(std::async(std::launch::async, async_encrypt, -1, sub1));
 
@@ -195,9 +197,6 @@ int main(int argc, char** argv) {
             for (auto& fut : fut_decrypt) {
                 std::cout << fut.get();
             }
-
-            // remove vector
-            // std::vector<std::future<std::string>>().swap(fut_decrypt);
 
             return 0;
         default:
