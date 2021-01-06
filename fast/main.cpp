@@ -1,5 +1,3 @@
-// #include <future>
-
 #include "bigint.hpp"
 
 const std::string rsa_n =
@@ -56,6 +54,22 @@ std::string async_encrypt(const int tp, const std::string& subline) {
     }
 }
 
+const reverse::Bigint Bbig("100000");
+
+std::string async_decrypt(const int tp, const std::string& st) {
+    const reverse::Bigint pst = reverse::Bigint(st).decrypt(rsa_n, rsa_d);
+
+    switch (tp) {
+        case 1:
+            return to_chars(pst.to_string());
+        default:
+            if (pst > Bbig) {
+                return to_chars(pst.to_string()) + "\n";
+            }
+            return "\n";
+    }
+}
+
 int main(int argc, char** argv) {
     std::ios_base::sync_with_stdio(false);
 
@@ -100,8 +114,8 @@ int main(int argc, char** argv) {
 
     int counter = 3;
     std::vector<std::future<std::string>> fut_encrypt;
+    std::vector<std::future<std::string>> fut_decrypt;
 
-    const reverse::Bigint Bbig("100000");
     switch (op[0]) {
         case '+':
             std::cout << (reverse::Bigint(num1) + reverse::Bigint(num2)).to_string()
@@ -141,32 +155,6 @@ int main(int argc, char** argv) {
                 << '\n';
             return 0;
         case 'e':
-            // while (!std::cin.eof()) {
-            //     std::string next_line;
-            //     std::getline(std::cin, next_line);
-            //     if (next_line.size() * 3 > rsa_n.size()) {
-            //         std::cout << reverse::Bigint(
-            //                          to_numeric(next_line.substr(0, rsa_n.size() / 3)))
-            //                          .encrypt(rsa_n, rsa_e)
-            //                          .to_string()
-            //                   << '\n';
-            //         std::cout << reverse::Bigint(to_numeric(next_line.substr(
-            //                                          rsa_n.size() / 3, rsa_n.size() / 3)))
-            //                          .encrypt(rsa_n, rsa_e)
-            //                          .to_string()
-            //                   << '\n';
-            //     } else {
-            //         std::cout << reverse::Bigint(to_numeric(next_line))
-            //                          .encrypt(rsa_n, rsa_e)
-            //                          .to_string()
-            //                   << '\n'
-            //                   << '\n';
-            //         // std::cout
-            //         //     << reverse::Bigint(++counter).encrypt(rsa_n, rsa_e).to_string()
-            //         //     << '\n';
-            //     }
-            // }
-
             while (!std::cin.eof()) {
                 std::string next_line;
                 std::getline(std::cin, next_line);
@@ -183,20 +171,14 @@ int main(int argc, char** argv) {
                 } else {
                     // 1 line
                     fut_encrypt.emplace_back(std::async(std::launch::async, async_encrypt, ++counter, next_line));
-
-                    // fut_encrypt.emplace_back(std::async(std::launch::async, async_encrypt, 2, std::to_string(++counter)));
                 }
             }
             for (auto& fut : fut_encrypt) {
-                // try {
-                //     // std::cout << fut.get() << '\n';
-                // } catch (...) {
-                //     continue;
-                //     // continue;
-                // }
-
                 std::cout << fut.get();
             }
+
+            // remove vector
+            std::vector<std::future<std::string>>().swap(fut_encrypt);
 
             return 0;
         case 'd':
@@ -204,14 +186,19 @@ int main(int argc, char** argv) {
                 std::string part1, part2;
                 std::getline(std::cin, part1);
                 std::getline(std::cin, part2);
-                std::cout << to_chars(
-                    reverse::Bigint(part1).decrypt(rsa_n, rsa_d).to_string());
-                const reverse::Bigint p2 = reverse::Bigint(part2).decrypt(rsa_n, rsa_d);
-                if (p2 > Bbig) {
-                    std::cout << to_chars(p2.to_string());
-                }
-                std::cout << '\n';
+
+                fut_decrypt.emplace_back(std::async(std::launch::async, async_decrypt, 1, part1));
+
+                fut_decrypt.emplace_back(std::async(std::launch::async, async_decrypt, 2, part2));
             }
+
+            for (auto& fut : fut_decrypt) {
+                std::cout << fut.get();
+            }
+
+            // remove vector
+            // std::vector<std::future<std::string>>().swap(fut_decrypt);
+
             return 0;
         default:
             std::cout << "Error: " << op << " is not a supported operator\n"
