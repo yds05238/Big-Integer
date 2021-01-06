@@ -1,5 +1,3 @@
-#include <future>
-
 #include "bigint.hpp"
 
 const std::string rsa_n =
@@ -47,15 +45,6 @@ std::string to_chars(reverse::Bigint to_numeric) noexcept {
     return nlas;
 }
 
-std::string async_encrypt(const int tp, const std::string& subline) {
-    switch (tp) {
-        case -1:
-            return reverse::Bigint(to_numeric(subline)).encrypt(rsa_n, rsa_e).to_string() + "\n";
-        default:
-            return reverse::Bigint(to_numeric(subline)).encrypt(rsa_n, rsa_e).to_string() + "\n" + reverse::Bigint(tp).encrypt(rsa_n, rsa_e).to_string() + "\n";
-    }
-}
-
 int main(int argc, char** argv) {
     std::ios_base::sync_with_stdio(false);
 
@@ -99,8 +88,6 @@ int main(int argc, char** argv) {
     }
 
     int counter = 3;
-    std::vector<std::future<std::string>> fut_encrypt;
-
     const reverse::Bigint Bbig("100000");
     switch (op[0]) {
         case '+':
@@ -141,63 +128,31 @@ int main(int argc, char** argv) {
                 << '\n';
             return 0;
         case 'e':
-            // while (!std::cin.eof()) {
-            //     std::string next_line;
-            //     std::getline(std::cin, next_line);
-            //     if (next_line.size() * 3 > rsa_n.size()) {
-            //         std::cout << reverse::Bigint(
-            //                          to_numeric(next_line.substr(0, rsa_n.size() / 3)))
-            //                          .encrypt(rsa_n, rsa_e)
-            //                          .to_string()
-            //                   << '\n';
-            //         std::cout << reverse::Bigint(to_numeric(next_line.substr(
-            //                                          rsa_n.size() / 3, rsa_n.size() / 3)))
-            //                          .encrypt(rsa_n, rsa_e)
-            //                          .to_string()
-            //                   << '\n';
-            //     } else {
-            //         std::cout << reverse::Bigint(to_numeric(next_line))
-            //                          .encrypt(rsa_n, rsa_e)
-            //                          .to_string()
-            //                   << '\n'
-            //                   << '\n';
-            //         // std::cout
-            //         //     << reverse::Bigint(++counter).encrypt(rsa_n, rsa_e).to_string()
-            //         //     << '\n';
-            //     }
-            // }
-
             while (!std::cin.eof()) {
                 std::string next_line;
                 std::getline(std::cin, next_line);
-
                 if (next_line.size() * 3 > rsa_n.size()) {
-                    // 2 lines
-                    const std::string sub1 = next_line.substr(0, rsa_n.size() / 3);
-                    const std::string sub2 = next_line.substr(rsa_n.size() / 3, rsa_n.size() / 3);
-
-                    fut_encrypt.emplace_back(std::async(std::launch::async, async_encrypt, -1, sub1));
-
-                    fut_encrypt.emplace_back(std::async(std::launch::async, async_encrypt, -1, sub2));
-
+                    std::cout << reverse::Bigint(
+                                     to_numeric(next_line.substr(0, rsa_n.size() / 3)))
+                                     .encrypt(rsa_n, rsa_e)
+                                     .to_string()
+                              << '\n';
+                    std::cout << reverse::Bigint(to_numeric(next_line.substr(
+                                                     rsa_n.size() / 3, rsa_n.size() / 3)))
+                                     .encrypt(rsa_n, rsa_e)
+                                     .to_string()
+                              << '\n';
                 } else {
-                    // 1 line
-                    fut_encrypt.emplace_back(std::async(std::launch::async, async_encrypt, ++counter, next_line));
-
-                    // fut_encrypt.emplace_back(std::async(std::launch::async, async_encrypt, 2, std::to_string(++counter)));
+                    std::cout << reverse::Bigint(to_numeric(next_line))
+                                     .encrypt(rsa_n, rsa_e)
+                                     .to_string()
+                              << '\n'
+                              << '\n';
+                    // std::cout
+                    //     << reverse::Bigint(++counter).encrypt(rsa_n, rsa_e).to_string()
+                    //     << '\n';
                 }
             }
-            for (auto& fut : fut_encrypt) {
-                // try {
-                //     // std::cout << fut.get() << '\n';
-                // } catch (...) {
-                //     continue;
-                //     // continue;
-                // }
-
-                std::cout << fut.get();
-            }
-
             return 0;
         case 'd':
             while (!std::cin.eof()) {
