@@ -4,12 +4,17 @@ Simple BigInt library with limiited functionalities. The library only uses C++17
 
 ### Usage
 
--  With Profiler enabled 
+- Compile using shell scripts provided
+    - compile.sh: no profiler 
+    - compile-pg.sh: profiler enabled
+
+-  Generate performance profiles
     - bigint e < one-liners > encoded
     - gprof bigint > analysis_encrypt.txt
 
     - bigint d < encoded
     - gprof bigint > analysis_decrypt.txt 
+
 
 - Basic timed Encrypt + Decrypt 
     - time echo "The quick brown fox jumps over the lazy dog" | bigint e | bigint d

@@ -37,4 +37,18 @@
 .vscode 
 
 todo.txt 
-temp.txt 
+
+./basic/bignum 
+./basic/analysis_decrypt.txt
+./basic/analysis_encrypt.txt 
+./basic/encoded
+./basic/gmon.out
+
+./fast/bignum 
+./fast/analysis_decrypt.txt
+./fast/analysis_encrypt.txt 
+./fast/encoded
+./fast/gmon.out
+./fast/bignum.gcda
+./fast/main.gcda
+./fast/normal_bignum.gcda
