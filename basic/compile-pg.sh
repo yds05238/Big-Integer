@@ -1,1 +1,1 @@
-g++ -O3 -Wall -Wpedantic -std=c++17 main.cpp bignum.cpp -o bignum -pg
+g++ -O3 -Wall -Wpedantic -std=c++17 main.cpp bigint.cpp -o bigint -pg

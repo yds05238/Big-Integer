@@ -1,43 +1,43 @@
 #include <iostream>
 #include <algorithm>
 #include <vector>
-#include "bignum.hpp"
+#include "bigint.hpp"
 
 //
-// A Bignum is just a std::vector containing digits in the range 0-9, following the decimal
+// A Bigint is just a std::vector containing digits in the range 0-9, following the decimal
 // convention that a number other than 0 has no leading 0's.  Oddly, that one rule made the
 // code unexpectedly complicated; it would have been easier to just allow numbers like 0002!
 //
 
-Bignum::Bignum()
+Bigint::Bigint()
 {
 }
 
-Bignum::Bignum(const Bignum& b)
+Bigint::Bigint(const Bigint& b)
 {
 	digits = b.digits;
 }
 
-Bignum::Bignum(int d)
+Bigint::Bigint(int d)
 {
 	digits.push_back(d);
 }
 
-const Bignum BZero(0);
-const Bignum BOne(1);
+const Bigint BZero(0);
+const Bigint BOne(1);
 
-Bignum::Bignum(std::string s)
+Bigint::Bigint(std::string s)
 {
 	for(auto c: s)
 		digits.push_back(c-'0');
 }
 
-std::vector<int> Bignum::as_vec()
+std::vector<int> Bigint::as_vec()
 {
 	return digits;
 }
 
-std::string Bignum::to_string()
+std::string Bigint::to_string()
 {
 	std::string s;
 	for(auto d: digits)
@@ -47,7 +47,7 @@ std::string Bignum::to_string()
 	return s;
 }
 
-bool Bignum::operator<(Bignum b)
+bool Bigint::operator<(Bigint b)
 {
 	int alen = digits.size();
 	int blen = b.digits.size();
@@ -74,34 +74,34 @@ bool Bignum::operator<(Bignum b)
 	return false;
 }
 
-bool Bignum::operator>(Bignum b)
+bool Bigint::operator>(Bigint b)
 {
 	return b<*this;
 }
 
-bool Bignum::operator==(Bignum b)
+bool Bigint::operator==(Bigint b)
 {
 	return ! (*this<b || b<*this);
 }
 
-bool Bignum::operator<=(Bignum b)
+bool Bigint::operator<=(Bigint b)
 {
 	return ! (*this>b);
 }
 
-bool Bignum::operator>=(Bignum b)
+bool Bigint::operator>=(Bigint b)
 {
 	return ! (*this<b);
 }
 
-bool Bignum::operator!=(Bignum b)
+bool Bigint::operator!=(Bigint b)
 {
 	return ! (*this==b);
 }
 
-Bignum Bignum::operator+(Bignum b)
+Bigint Bigint::operator+(Bigint b)
 {
-	Bignum res;
+	Bigint res;
 	int alen = digits.size();
 	int blen = b.digits.size();
 	int aindex = 0, bindex = 0;
@@ -135,9 +135,9 @@ Bignum Bignum::operator+(Bignum b)
 	return res;
 }
 
-Bignum Bignum::operator-(Bignum b)
+Bigint Bigint::operator-(Bigint b)
 {
-	Bignum res;
+	Bigint res;
 	int alen = digits.size();
 	int blen = b.digits.size();
 	if(*this < b)
@@ -199,10 +199,10 @@ Bignum Bignum::operator-(Bignum b)
 	return res;
 }
 
-// Helper procedure to multiple a Bignum by an integer.  This could be just a single
+// Helper procedure to multiple a Bigint by an integer.  This could be just a single
 // digit, but in fact it will sometimes be 10 in my code.  We multiple all the digits
 // first, then sweep from low to high digit applying the carries.
-Bignum Bignum::operator*(int d)
+Bigint Bigint::operator*(int d)
 {
 	if(d == 0)
 	{
@@ -212,7 +212,7 @@ Bignum Bignum::operator*(int d)
 	{
 		return *this;
 	}
-	Bignum res;
+	Bigint res;
 	int alen = digits.size();
 	int aindex = 0;
 	while(alen--)
@@ -234,11 +234,11 @@ Bignum Bignum::operator*(int d)
 	return res;
 }
 
-Bignum Bignum::operator*(Bignum b)
+Bigint Bigint::operator*(Bigint b)
 {
 	int blen = b.digits.size();
-	Bignum tmp = *this;
-	Bignum res = BZero;
+	Bigint tmp = *this;
+	Bigint res = BZero;
 	while(blen > 0)
 	{
 		int d = b.digits[--blen];
@@ -258,7 +258,7 @@ Bignum Bignum::operator*(Bignum b)
 	return res;
 }
 
-Bignum Bignum::operator/(Bignum b)
+Bigint Bigint::operator/(Bigint b)
 {
 	if(b > *this)
 	{
@@ -273,8 +273,8 @@ Bignum Bignum::operator/(Bignum b)
 		std::cout << "Error: Divide by 0" << std::endl;
 		exit(1);
 	}
-	Bignum res;
-	Bignum tmp;
+	Bigint res;
+	Bigint tmp;
 	int alen = digits.size();
 	int blen = b.digits.size();
 	int aindex = 0;
@@ -331,20 +331,20 @@ Bignum Bignum::operator/(Bignum b)
 	return res;
 }
 
-Bignum Bignum::operator%(Bignum b)
+Bigint Bigint::operator%(Bigint b)
 {
 	return *this - (*this/b)*b;
 }
 
-Bignum Bignum::expmod(Bignum exp, Bignum mod)
+Bigint Bigint::expmod(Bigint exp, Bigint mod)
 {
 	if(exp == BZero)
 	{
 		return BOne;
 	}
-	Bignum two = Bignum(2);
-	Bignum res = BOne;
-	Bignum tmp = *this;
+	Bigint two = Bigint(2);
+	Bigint res = BOne;
+	Bigint tmp = *this;
 	while(exp > 0)
 	{
 		if(exp % two == BOne)
@@ -359,19 +359,19 @@ Bignum Bignum::expmod(Bignum exp, Bignum mod)
 	return res;
 }
 
-Bignum Bignum::gcd(Bignum b)
+Bigint Bigint::gcd(Bigint b)
 {
 	if (b == BZero)
 		return *this;
 	return b.gcd(*this % b);
 }
 
-Bignum Bignum::encrypt(std::string rsa_n, std::string rsa_e)
+Bigint Bigint::encrypt(std::string rsa_n, std::string rsa_e)
 {
-	return expmod(Bignum(rsa_e), Bignum(rsa_n)).to_string();
+	return expmod(Bigint(rsa_e), Bigint(rsa_n)).to_string();
 }
 
-Bignum Bignum::decrypt(std::string rsa_n, std::string rsa_d)
+Bigint Bigint::decrypt(std::string rsa_n, std::string rsa_d)
 {
-	return expmod(Bignum(rsa_d), Bignum(rsa_n));
+	return expmod(Bigint(rsa_d), Bigint(rsa_n));
 }
