@@ -36,7 +36,6 @@
 .vscode/
 .vscode 
 
-todo.txt 
 
 ./basic/bignum 
 ./basic/analysis_decrypt.txt
@@ -52,3 +51,7 @@ todo.txt
 ./fast/bignum.gcda
 ./fast/main.gcda
 ./fast/normal_bignum.gcda
+
+
+notes.txt
+todo.txt 
